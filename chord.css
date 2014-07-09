@@ -1,0 +1,55 @@
+.background {
+	background-color: rgb(27, 25, 15);
+}
+
+.noteInKey {
+	stroke: rgb(132, 127, 100);
+	stroke-width: 1;
+	fill: rgb(27, 25, 15);
+}
+.noteOffKey {
+	stroke: rgba(132, 127, 100, .235);	
+	stroke-width: 1;
+	fill: rgb(27, 25, 15);
+}
+.notePlayed.noteInKey {
+	stroke: rgb(132, 127, 100);	
+	stroke-width: 1;
+	fill: rgb(242, 237, 208);	
+}
+.notePlayed.noteOffKey {
+  stroke: rgb(132, 127, 100); 
+  stroke-width: 1;
+  fill: hsl(51, 14%, 35%); 
+}
+
+.notePlayed.tonic {
+	stroke: rgb(242, 237, 208);	
+	stroke-width: 3;
+	fill: rgb(27, 25, 15);
+}
+
+  .gap1 {
+  	stroke-width: 6;
+  	stroke: rgb(255, 192, 0);
+  }
+  .gap2 {
+  	stroke-width: 6;
+  	stroke: rgb(255, 255, 0);
+  }
+  .gap3 {
+ 	stroke-width: 6;
+  	stroke: rgb(232, 18, 130); // 0, 176, 240);
+}
+  .gap4 {
+  	stroke-width: 6;
+  	stroke: rgb(75, 225, 63);
+  }
+  .gap5 {
+  	stroke-width: 6;
+  	stroke: rgb(79, 129, 189);
+  }
+  .gap6 {
+  	stroke-width: 6;
+  	stroke: rgb(228, 108, 10);
+  }
