@@ -39,7 +39,7 @@
   }
   .gap3 {
  	stroke-width: 6;
-  	stroke: rgb(232, 18, 130); // 0, 176, 240);
+  	stroke: rgb(232, 18, 130); /* 0, 176, 240); */
 }
   .gap4 {
   	stroke-width: 6;

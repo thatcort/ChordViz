@@ -3,143 +3,179 @@
 <head>
 	<title>Chords</title>
 	<script type="text/javascript" src="lib/d3.v2.js"></script>
+
+	<script type="text/javascript" src="js/chordData.js"></script>
+	<script type="text/javascript" src="js/chordCircle.js"></script>
+	<script type="text/javascript" src="js/player.js"></script>
+
 	<link rel="stylesheet" type="text/css" href="chord.css"/>
 </head>
 <body class="background">
-	<audio src="audio/piano/2C.mp3" autoplay></audio>
-	<audio src="audio/piano/3A.mp3" autoplay></audio>
+	<audio src="audio/piano/2C#.mp3" autoplay></audio>
+	<!-- <audio src="audio/piano/3A.mp3" autoplay></audio> -->
+
 	<div id="chordContainer"></div>
+	<div id="audios"></div>
 	<script type="text/javascript">
-		var chordRad = 100; // radius of main chord circle
-		var noteRad = 10;   // radius of note circles
 
-		var noteAngle = Math.PI / 6.0;
-		var HALF_PI = Math.PI * .5;
-
-		var majorKey = [ true, false, true, false, true, true, false, true, false, true, false, true ];
-
-		var currentKey = majorKey;
-
-		var svg = d3.select("#chordContainer")
-					.append("svg")
-					.attr("width", "100%")
-					.attr("height", "600");
-
+		var chordRad = 400; // radius of main chord circle
 		var marginX = 20;
 		var marginY = 30;
 
-		var chordGroup = svg.append("g") // origin at the centre of the circle
-							.attr("transform", "translate(" + (chordRad+marginX) + ", " + (chordRad+marginY) + ")");
+		var svg = d3.select("#chordContainer")
+					.append("svg")
+					.attr("width", "1000")
+					.attr("height", "1000");
 
-		var gapGroup = chordGroup.append("g");
-		var noteGroup = chordGroup.append("g");
+		var rootG = svg.append('g')
+					.attr('transform', 'translate(' + marginX + ', ' + marginY + ')');
 
-		// add 12 notes
-		var noteCircles = noteGroup.selectAll("circle").data(currentKey)
-							.enter().append("circle")
-								.attr("cx", function(d, i) { return getNoteX(i); })
-								.attr("cy", function(d, i) { return getNoteY(i); })
-								.attr("r", noteRad)
-								.classed("note", true);
+		var chordData = chordData();
+		chordData.init();
 
-		var majorTriad 	= [true, false, false, false, true, false, false, true, false, false, false, false];
-		var major7     	= [true, false, false, false, true, false, false, true, false, false, false, true];
-		var minorTriad 	= [true, false, false, true, false, false, false, true, false, false, false, false];
-		var dom7  		= [true, false, false, false, true, false, false, true, false, false, true, false];
-		var dom7add9	= [true, false, true, false, true, false, false, true, false, false, true, false];
+		var player = chordPlayer();
 
-		var I 		= createChord("I", 0, majorTriad);
-		var Imaj7 	= createChord("Imaj7", 0, major7);
-		var ii 		= createChord("ii", 2, minorTriad);
-		var iii 	= createChord("iii", 4, minorTriad);
-		var IV 		= createChord("IV", 5, majorTriad);
-		var V 		= createChord("V", 7, majorTriad);
-		var V7 		= createChord("V7", 7, dom7);
-		var V7add9 	= createChord("V7add9", 7, dom7add9);
-
-		function createChord(name, tonic, notes) {
-			return {
-				name: name,
-				tonic: tonic,
-				notes: notes
-			};
-		}
-
-		function getNoteX(note) { // note is relative to tonic
-		  return chordRad * Math.cos(noteAngle*(note) - HALF_PI);
-		}
-		function getNoteY(note) { // note is relative to tonic
-		  return chordRad * Math.sin(noteAngle*(note) - HALF_PI);
-		}
-
-		function isInKey(note) { return currentKey[note]; }
-		function isPlayed(note, chord) { // note is relative to key, NOT to tonic
-			var n = note - chord.tonic;
-			if (n < 0)
-				n += 12;
-			return chord.notes[n];
-		}
-
-		function drawKey() {
-			noteCircles.data(currentKey)
-					.classed("noteInKey", function(d, i) { return isInKey(i); })
-					.classed("noteOffKey", function(d, i) { return !isInKey(i); })
-					.classed("notePlayed", false)
-					.classed("notePlayedTonic", false);
-
-		}
-
-		function drawChord(chord) {
-			noteCircles.data(chord.notes)
-					.classed("noteInKey", function(d, i) { return isInKey(i); })
-					.classed("noteOffKey", function(d, i) { return !isInKey(i); })
-					.classed("notePlayed", function(d, i) { return isPlayed(i, chord); })
-					.classed("tonic", function(d, i) { return i == chord.tonic; });
-
-			drawGaps(chord);
-		}
-
-		function drawGaps(chord) {
-			var gapData = [];
-			for (var i=0; i < 12; i++) {
-				if (chord.notes[i]) {
-					for (var j=i+1; j < 12; j++) {
-						if (chord.notes[j]) {
-							var gap = j - i;
-							if (gap > 6)
-								gap = 12 - gap;
-							gap--;
-							gapData.push([(i+chord.tonic)%12, (j+chord.tonic)%12, gap]);
-						}
-					}
-				}
-			}
-
-			var gapLines = gapGroup.selectAll("line").data(gapData);
-
-			gapLines.enter().append("line");
-
-			gapLines.exit().remove();
-
-			gapLines.classed("gap1", function(d) { return d[2] === 0; })
-					.classed("gap2", function(d) { return d[2] === 1; })
-					.classed("gap3", function(d) { return d[2] === 2; })
-					.classed("gap4", function(d) { return d[2] === 3; })
-					.classed("gap5", function(d) { return d[2] === 4; })
-					.classed("gap6", function(d) { return d[2] === 5; })
-					.attr("x1", function(d) { 
-						return getNoteX(d[0]); })
-					.attr("y1", function(d) { return getNoteY(d[0]); })
-					.attr("x2", function(d) { return getNoteX(d[1]); })
-					.attr("y2", function(d) { return getNoteY(d[1]); });
-		}
-
-
-		drawKey();
-		drawChord(V7add9);
+		var chordCircle = chordCircle();
+		chordCircle.chordRad = chordRad;
+		chordCircle.init(rootG, chordData, player);
 		
-		// var testChord = createChord("I", 0, [true, true, false, false, true, false, false, true, false, false, false, false]);
-		// drawChord(testChord);
+
+
+
+	</script>
+
+	<div id="chordContainer1"></div>
+	<script type="text/javascript">
+		// var chordRad = 100; // radius of main chord circle
+		// var noteRad = 10;   // radius of note circles
+
+		// var noteAngle = Math.PI / 6.0;
+		// var HALF_PI = Math.PI * .5;
+
+		// var majorKey = [ true, false, true, false, true, true, false, true, false, true, false, true ];
+
+		// var currentKey = majorKey;
+
+		// var svg = d3.select("#chordContainer1")
+		// 			.append("svg")
+		// 			.attr("width", "100%")
+		// 			.attr("height", "600");
+
+		// var marginX = 20;
+		// var marginY = 30;
+
+		// var chordGroup = svg.append("g") // origin at the centre of the circle
+		// 					.attr("transform", "translate(" + (chordRad+marginX) + ", " + (chordRad+marginY) + ")");
+
+		// var gapGroup = chordGroup.append("g");
+		// var noteGroup = chordGroup.append("g");
+
+		// // add 12 notes
+		// var noteCircles = noteGroup.selectAll("circle").data(currentKey)
+		// 					.enter().append("circle")
+		// 						.attr("cx", function(d, i) { return getNoteX(i); })
+		// 						.attr("cy", function(d, i) { return getNoteY(i); })
+		// 						.attr("r", noteRad)
+		// 						.classed("note", true);
+
+		// var majorTriad 	= [true, false, false, false, true, false, false, true, false, false, false, false];
+		// var major7     	= [true, false, false, false, true, false, false, true, false, false, false, true];
+		// var minorTriad 	= [true, false, false, true, false, false, false, true, false, false, false, false];
+		// var dom7  		= [true, false, false, false, true, false, false, true, false, false, true, false];
+		// var dom7add9	= [true, false, true, false, true, false, false, true, false, false, true, false];
+
+		// var I 		= createChord("I", 0, majorTriad);
+		// var Imaj7 	= createChord("Imaj7", 0, major7);
+		// var ii 		= createChord("ii", 2, minorTriad);
+		// var iii 	= createChord("iii", 4, minorTriad);
+		// var IV 		= createChord("IV", 5, majorTriad);
+		// var V 		= createChord("V", 7, majorTriad);
+		// var V7 		= createChord("V7", 7, dom7);
+		// var V7add9 	= createChord("V7add9", 7, dom7add9);
+
+		// function createChord(name, tonic, notes) {
+		// 	return {
+		// 		name: name,
+		// 		tonic: tonic,
+		// 		notes: notes
+		// 	};
+		// }
+
+		// function getNoteX(note) { // note is relative to tonic
+		//   return chordRad * Math.cos(noteAngle*(note) - HALF_PI);
+		// }
+		// function getNoteY(note) { // note is relative to tonic
+		//   return chordRad * Math.sin(noteAngle*(note) - HALF_PI);
+		// }
+
+		// function isInKey(note) { return currentKey[note]; }
+		// function isPlayed(note, chord) { // note is relative to key, NOT to tonic
+		// 	var n = note - chord.tonic;
+		// 	if (n < 0)
+		// 		n += 12;
+		// 	return chord.notes[n];
+		// }
+
+		// function drawKey() {
+		// 	noteCircles.data(currentKey)
+		// 			.classed("noteInKey", function(d, i) { return isInKey(i); })
+		// 			.classed("noteOffKey", function(d, i) { return !isInKey(i); })
+		// 			.classed("notePlayed", false)
+		// 			.classed("notePlayedTonic", false);
+
+		// }
+
+		// function drawChord(chord) {
+		// 	noteCircles.data(chord.notes)
+		// 			.classed("noteInKey", function(d, i) { return isInKey(i); })
+		// 			.classed("noteOffKey", function(d, i) { return !isInKey(i); })
+		// 			.classed("notePlayed", function(d, i) { return isPlayed(i, chord); })
+		// 			.classed("tonic", function(d, i) { return i == chord.tonic; });
+
+		// 	drawGaps(chord);
+		// }
+
+		// function drawGaps(chord) {
+		// 	var gapData = [];
+		// 	for (var i=0; i < 12; i++) {
+		// 		if (chord.notes[i]) {
+		// 			for (var j=i+1; j < 12; j++) {
+		// 				if (chord.notes[j]) {
+		// 					var gap = j - i;
+		// 					if (gap > 6)
+		// 						gap = 12 - gap;
+		// 					gap--;
+		// 					gapData.push([(i+chord.tonic)%12, (j+chord.tonic)%12, gap]);
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+
+		// 	var gapLines = gapGroup.selectAll("line").data(gapData);
+
+		// 	gapLines.enter().append("line");
+
+		// 	gapLines.exit().remove();
+
+		// 	gapLines.classed("gap1", function(d) { return d[2] === 0; })
+		// 			.classed("gap2", function(d) { return d[2] === 1; })
+		// 			.classed("gap3", function(d) { return d[2] === 2; })
+		// 			.classed("gap4", function(d) { return d[2] === 3; })
+		// 			.classed("gap5", function(d) { return d[2] === 4; })
+		// 			.classed("gap6", function(d) { return d[2] === 5; })
+		// 			.attr("x1", function(d) { 
+		// 				return getNoteX(d[0]); })
+		// 			.attr("y1", function(d) { return getNoteY(d[0]); })
+		// 			.attr("x2", function(d) { return getNoteX(d[1]); })
+		// 			.attr("y2", function(d) { return getNoteY(d[1]); });
+		// }
+
+
+		// drawKey();
+		// drawChord(V7add9);
+		
+		// // var testChord = createChord("I", 0, [true, true, false, false, true, false, false, true, false, false, false, false]);
+		// // drawChord(testChord);
 	</script>
 </body>
 </html>
