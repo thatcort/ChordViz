@@ -23,7 +23,12 @@ function chordPlayer() {
 	player.playChord = function(notes) {
 		for (var i=0; i < notes.length; i++) {
 			var note = notes[i];
-			audios[note.index].play();
+			var audio = audios[note.index];
+			if (!audio.ended) {
+				audio.pause();
+			}
+			audio.currentTime = 0;
+			audio.play();
 		}
 	}
 
