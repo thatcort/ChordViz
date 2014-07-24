@@ -12,7 +12,8 @@ function chordCircle() {
 	var notes;
 
 	var rootG,
-		notesG;
+		notesG,
+		gapG;
 
 	var playedNotes = []; // an array of all notes, with indices marked true when that note is played
 	var chord = []; // an array of just the currently played notes
@@ -23,7 +24,9 @@ function chordCircle() {
 	var majorKey = [ true, false, true, false, true, true, false, true, false, true, false, true ];
 
 	var currentKey = majorKey;
-	var keyIndex = 1;
+	var keyIndex = 0;
+
+	var gapRadius;
 
 
 	context.init = function(parent, chordData, chordPlayer) {
@@ -31,11 +34,14 @@ function chordCircle() {
 		player = chordPlayer;
 		notes = data.getNotes();
 
+		gapRadius = noteRadius(notes[notes.length-1]) - context.noteRad*2;
+
 		rootG = parent.append('g')
 					.attr('transform', 'translate(' + chordRad + ', ' + chordRad + ')');
 		context.rootElem = rootG;
 
 		notesG = rootG.append('g');
+		gapG = rootG.append('g');
 
 		renderNotes();
 	}
@@ -56,6 +62,7 @@ function chordCircle() {
 					playedNotes[i] = !playedNotes[i];
 					d3.select(this).classed("notePlayed", playedNotes[i]);
 					updateChord();
+					drawGaps();
 					playChord();
 				});
 	}
@@ -82,9 +89,60 @@ function chordCircle() {
 				chord.push(notes[i]);
 		}
 	}
+	
 	function playChord() {
 		player.playChord(chord);
 	}
+
+
+
+	function gapX(index) { // note is relative to tonic
+	  return gapRadius * Math.cos(NOTE_ANGLE * index - HALF_PI);
+	}
+	function gapY(index) { // note is relative to tonic
+	  return gapRadius * Math.sin(NOTE_ANGLE * index - HALF_PI);
+	}
+
+	function drawGaps(chord) {
+		var playedOctave = [];
+		for (var i=0; i < playedNotes.length; i++) {
+			playedOctave[i%12] |= playedOctave[i%12] || playedNotes[i];
+		}
+
+		var gapData = [];
+		for (var i=0; i < 12; i++) {
+			if (playedOctave[i]) {
+				for (var j=i+1; j < 12; j++) {
+					if (playedOctave[j]) {
+						var gap = j - i;
+						if (gap > 6)
+							gap = 12 - gap;
+						gap--;
+						gapData.push([i, j, gap]);
+					}
+				}
+			}
+		}
+
+		var gapLines = gapG.selectAll("line").data(gapData);
+
+		gapLines.enter().append("line");
+
+		gapLines.exit().remove();
+
+		gapLines.classed("gap1", function(d) { return d[2] === 0; })
+				.classed("gap2", function(d) { return d[2] === 1; })
+				.classed("gap3", function(d) { return d[2] === 2; })
+				.classed("gap4", function(d) { return d[2] === 3; })
+				.classed("gap5", function(d) { return d[2] === 4; })
+				.classed("gap6", function(d) { return d[2] === 5; })
+				.attr("x1", function(d) { return gapX(d[0]); })
+				.attr("y1", function(d) { return gapY(d[0]); })
+				.attr("x2", function(d) { return gapX(d[1]); })
+				.attr("y2", function(d) { return gapY(d[1]); });
+	}
+
+
 
 	return context;
 }
