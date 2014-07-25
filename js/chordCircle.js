@@ -45,7 +45,7 @@ function chordCircle() {
 		radialG = rootG.append('g');
 		spiralG = rootG.append('g');
 		notesG = rootG.append('g');
-		gapG = rootG.append('g');
+		gapG = rootG.append('g').classed("gaps", true);
 
 		gapG.append('circle')
 			.classed('gapCircle', true)
@@ -185,7 +185,8 @@ function chordCircle() {
 				.attr("y1", function(d) { return gapY(d[0]); })
 				.attr("x2", function(d) { return gapX(d[1]); })
 				.attr("y2", function(d) { return gapY(d[1]); })
-				.attr("stroke-opacity", .7);
+				;
+				// .attr("stroke-opacity", .7);
 	}
 
 

@@ -3,11 +3,11 @@
 }
 
 .noteSpiral {
-	stroke: #555;
+	stroke: #444;
 	fill: none;
 }
 .radial {
-	stroke: #333;
+	stroke: #222;
 	stroke-width: 13;
 	fill: none;
 }
@@ -43,33 +43,26 @@
 	fill: rgb(27, 25, 15);
 }
 
-.gap1 {
-	stroke-width: 6;
-	stroke: rgb(255, 192, 0);
+.gaps {
+	stroke-opacity: .7;
+	stroke-width: 10;
 	stroke-linecap: round;
+}
+.gap1 {
+	stroke: rgb(255, 192, 0);
 }
 .gap2 {
-	stroke-width: 6;
 	stroke: rgb(255, 255, 0);
-	stroke-linecap: round;
 }
 .gap3 {
-	stroke-width: 6;
 	stroke: rgb(232, 18, 130); /* 0, 176, 240); */
-	stroke-linecap: round;
 }
 .gap4 {
-	stroke-width: 6;
 	stroke: rgb(75, 225, 63);
-	stroke-linecap: round;
 }
 .gap5 {
-	stroke-width: 6;
 	stroke: rgb(79, 129, 189);
-	stroke-linecap: round;
 }
 .gap6 {
-	stroke-width: 6;
 	stroke: rgb(228, 108, 10);
-	stroke-linecap: round;
 }
