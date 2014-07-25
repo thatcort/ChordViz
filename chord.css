@@ -2,13 +2,27 @@
 	background-color: rgb(27, 25, 15);
 }
 
+.noteSpiral {
+	stroke: #555;
+	fill: none;
+}
+.radial {
+	stroke: #333;
+	stroke-width: 13;
+	fill: none;
+}
+.gapCircle {
+	stroke: none;
+	fill: none;
+}
+
 .noteInKey {
 	stroke: rgb(132, 127, 100);
-	stroke-width: 1;
+	stroke-width: 2;
 	fill: rgb(27, 25, 15);
 }
 .noteOffKey {
-	stroke: rgba(132, 127, 100, .235);	
+	stroke: rgba(132, 127, 100, .7);	
 	stroke-width: 1;
 	fill: rgb(27, 25, 15);
 }
@@ -18,9 +32,9 @@
 	fill: rgb(242, 237, 208);	
 }
 .notePlayed.noteOffKey {
-  stroke: rgb(132, 127, 100); 
-  stroke-width: 1;
-  fill: hsl(51, 14%, 35%); 
+	stroke: rgb(132, 127, 100); 
+	stroke-width: 1;
+	fill: hsl(51, 14%, 35%); 
 }
 
 .notePlayed.tonic {
@@ -29,27 +43,33 @@
 	fill: rgb(27, 25, 15);
 }
 
-  .gap1 {
-  	stroke-width: 6;
-  	stroke: rgb(255, 192, 0);
-  }
-  .gap2 {
-  	stroke-width: 6;
-  	stroke: rgb(255, 255, 0);
-  }
-  .gap3 {
- 	stroke-width: 6;
-  	stroke: rgb(232, 18, 130); /* 0, 176, 240); */
+.gap1 {
+	stroke-width: 6;
+	stroke: rgb(255, 192, 0);
+	stroke-linecap: round;
 }
-  .gap4 {
-  	stroke-width: 6;
-  	stroke: rgb(75, 225, 63);
-  }
-  .gap5 {
-  	stroke-width: 6;
-  	stroke: rgb(79, 129, 189);
-  }
-  .gap6 {
-  	stroke-width: 6;
-  	stroke: rgb(228, 108, 10);
-  }
+.gap2 {
+	stroke-width: 6;
+	stroke: rgb(255, 255, 0);
+	stroke-linecap: round;
+}
+.gap3 {
+	stroke-width: 6;
+	stroke: rgb(232, 18, 130); /* 0, 176, 240); */
+	stroke-linecap: round;
+}
+.gap4 {
+	stroke-width: 6;
+	stroke: rgb(75, 225, 63);
+	stroke-linecap: round;
+}
+.gap5 {
+	stroke-width: 6;
+	stroke: rgb(79, 129, 189);
+	stroke-linecap: round;
+}
+.gap6 {
+	stroke-width: 6;
+	stroke: rgb(228, 108, 10);
+	stroke-linecap: round;
+}

@@ -13,7 +13,9 @@ function chordCircle() {
 
 	var rootG,
 		notesG,
-		gapG;
+		gapG,
+		radialG,
+		spiralG;
 
 	var playedNotes = []; // an array of all notes, with indices marked true when that note is played
 	var chord = []; // an array of just the currently played notes
@@ -34,27 +36,67 @@ function chordCircle() {
 		player = chordPlayer;
 		notes = data.getNotes();
 
-		gapRadius = noteRadius(notes[notes.length-1]) - context.noteRad*2;
+		gapRadius = noteRadius(notes.length-1) - context.noteRad*2;
 
 		rootG = parent.append('g')
 					.attr('transform', 'translate(' + chordRad + ', ' + chordRad + ')');
 		context.rootElem = rootG;
 
+		radialG = rootG.append('g');
+		spiralG = rootG.append('g');
 		notesG = rootG.append('g');
 		gapG = rootG.append('g');
 
-		renderNotes();
+		gapG.append('circle')
+			.classed('gapCircle', true)
+			.attr('r', gapRadius);
+
+		drawRadials();
+		drawSpiral();
+		drawNotes();
 	}
 
+	function drawSpiral() {
+		var cpFactor = .25;
+		var x0 = noteX(0);
+		var y0 = noteY(0);
+		var d = "M " + x0 + ',' + y0;
+		for (var i=1; i < notes.length; i++) {
+			var x1 = noteX(i);
+			var y1 = noteY(i);
+			var cpAngle = noteAngle(i) - NOTE_ANGLE*.5;
+			// var cpRadius = (noteRadius(i) + noteRadius(i-1))*.5;
+			var cpRadius = noteRadius(i-1);
+			var cpX = cpRadius * Math.cos(cpAngle);
+			var cpY = cpRadius * Math.sin(cpAngle);
+			d += ' Q' + cpX + ',' + cpY + ' ' + x1 + ',' + y1
+			x0 = x1;
+			y0 = y1;
+		}
+		var path = spiralG.append('path')
+					.classed('noteSpiral', true)
+					.attr('d', d);
+	}
 
-	function renderNotes() {
+	function drawRadials() {
+		for (var i=0; i < 12; i++) {
+			radialG.append('line')
+				.classed('radial', true)
+				.attr('x1', gapX(i))
+				.attr('y1', gapY(i))
+				.attr('x2', noteX(i))
+				.attr('y2', noteY(i));
+		}
+	}
+
+	function drawNotes() {
 		var noteSel = notesG.selectAll('g').data(notes);
 
 		noteSel.enter().append('g')
 			.append('circle')
 				.attr('r', context.noteRad)
-				.attr('cx', function(d) { return noteX(d); })
-				.attr('cy', function(d) { return noteY(d); });
+				.attr('cx', function(d) { return noteX(d.index); })
+				.attr('cy', function(d) { return noteY(d.index); });
 
 		noteSel.classed('noteInKey', noteInKey)
 				.classed('noteOffKey', noteOffKey)
@@ -67,14 +109,17 @@ function chordCircle() {
 				});
 	}
 
-	function noteRadius(note) {
-		return context.chordRad - (context.octaveGap / 12) * note.index;
+	function noteRadius(index) {
+		return context.chordRad - (context.octaveGap / 12) * index;
 	}
-	function noteX(note) { // note is relative to tonic
-	  return noteRadius(note) * Math.cos(NOTE_ANGLE * note.index - HALF_PI);
+	function noteX(index) { // note is relative to tonic
+	  return noteRadius(index) * Math.cos(noteAngle(index));
 	}
-	function noteY(note) { // note is relative to tonic
-	  return noteRadius(note) * Math.sin(NOTE_ANGLE * note.index - HALF_PI);
+	function noteY(index) { // note is relative to tonic
+	  return noteRadius(index) * Math.sin(noteAngle(index));
+	}
+	function noteAngle(index) {
+		return NOTE_ANGLE * index - HALF_PI;
 	}
 
 	function noteInKey(note) {
@@ -139,7 +184,8 @@ function chordCircle() {
 				.attr("x1", function(d) { return gapX(d[0]); })
 				.attr("y1", function(d) { return gapY(d[0]); })
 				.attr("x2", function(d) { return gapX(d[1]); })
-				.attr("y2", function(d) { return gapY(d[1]); });
+				.attr("y2", function(d) { return gapY(d[1]); })
+				.attr("stroke-opacity", .7);
 	}
 
 
