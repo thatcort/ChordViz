@@ -19,8 +19,8 @@
 	<script type="text/javascript">
 
 		var chordRad = 200; // radius of main chord circle
-		var marginX = 20;
-		var marginY = 30;
+		var marginX = 140;
+		var marginY = 40;
 
 		var svg = d3.select("#chordContainer")
 					.append("svg")
@@ -33,11 +33,16 @@
 		var chordData = chordData();
 		chordData.init();
 
+		var chordCircle = chordCircle();
 		var player = chordPlayer();
 
-		var chordCircle = chordCircle();
-		chordCircle.chordRad = chordRad;
-		chordCircle.init(rootG, chordData, player);
+		function playerCallback() {
+			chordCircle.chordRad = chordRad;
+			chordCircle.init(rootG, chordData, player);
+		}
+		player.init(playerCallback);
+
+		
 		
 
 

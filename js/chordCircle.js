@@ -15,7 +15,8 @@ function chordCircle() {
 		notesG,
 		gapG,
 		radialG,
-		spiralG;
+		spiralG,
+		labelG;
 
 	var playedNotes = []; // an array of all notes, with indices marked true when that note is played
 	var chord = []; // an array of just the currently played notes
@@ -28,7 +29,8 @@ function chordCircle() {
 	var currentKey = majorKey;
 	var keyIndex = 0;
 
-	var gapRadius;
+	var gapRadius,
+		labelRadius;
 
 
 	context.init = function(parent, chordData, chordPlayer) {
@@ -37,6 +39,7 @@ function chordCircle() {
 		notes = data.getNotes();
 
 		gapRadius = noteRadius(notes.length-1) - context.noteRad*2;
+		labelRadius = context.chordRad + context.noteRad*2;
 
 		rootG = parent.append('g')
 					.attr('transform', 'translate(' + chordRad + ', ' + chordRad + ')');
@@ -46,14 +49,17 @@ function chordCircle() {
 		spiralG = rootG.append('g');
 		notesG = rootG.append('g');
 		gapG = rootG.append('g').classed("gaps", true);
-
-		gapG.append('circle')
-			.classed('gapCircle', true)
-			.attr('r', gapRadius);
+		labelG = rootG.append('g');
 
 		drawRadials();
 		drawSpiral();
 		drawNotes();
+		drawLabels();
+
+		rootG.append('circle')
+			.classed('gapCircle', true)
+			.attr('r', gapRadius)
+			.on('click', playChord);
 	}
 
 	function drawSpiral() {
@@ -65,8 +71,7 @@ function chordCircle() {
 			var x1 = noteX(i);
 			var y1 = noteY(i);
 			var cpAngle = noteAngle(i) - NOTE_ANGLE*.5;
-			// var cpRadius = (noteRadius(i) + noteRadius(i-1))*.5;
-			var cpRadius = noteRadius(i-1);
+			var cpRadius = noteRadius(i-1) * 1.02;
 			var cpX = cpRadius * Math.cos(cpAngle);
 			var cpY = cpRadius * Math.sin(cpAngle);
 			d += ' Q' + cpX + ',' + cpY + ' ' + x1 + ',' + y1
@@ -89,16 +94,46 @@ function chordCircle() {
 		}
 	}
 
-	function drawNotes() {
-		var noteSel = notesG.selectAll('g').data(notes);
+	function drawLabels() {
+		var labelSel = labelG.selectAll("text").data(notes.slice(0,12));
+		labelSel.enter().append("text")
+			// .attr("transform", function(d,i) { return 'translate(' + labelRadius*Math.cos(noteAngle(i)) + ',' + labelRadius*Math.sin(noteAngle(i)) + ')'; })
+			.attr("transform", function(d,i) {
+				var rad = noteRadius(i) + context.noteRad*2;
+				var ang = noteAngle(i);
+				return 'translate(' + rad*Math.cos(ang) + ',' + rad*Math.sin(ang) + ')';
+			})
+			.classed('noteName', true)
+			.attr('text-anchor', function(d,i) {
+				if (i === 0 || i === 6) {
+					return 'middle';
+				} else if (i < 6) {
+					return 'start';
+				} else {
+					return 'end';
+				}
+			})
+			.attr('dominant-baseline', function(d,i) {
+				if (i === 3 || i === 9) {
+					return 'middle';
+				} else if (i < 3 || i > 9) {
+					return 'text-after-edge';
+				} else {
+					return 'text-before-edge';
+				}
+			})
+			.text(function(d) { return d.name; });
+	}
 
-		noteSel.enter().append('g')
+	function drawNotes() {
+		var noteSel = notesG.selectAll('circle').data(notes);
+
+		noteSel.enter() // .append('g')
 			.append('circle')
 				.attr('r', context.noteRad)
-				.attr('cx', function(d) { return noteX(d.index); })
-				.attr('cy', function(d) { return noteY(d.index); });
-
-		noteSel.classed('noteInKey', noteInKey)
+				.attr('cx', 0)
+				.attr('cy', -context.chordRad)
+				.classed('noteInKey', noteInKey)
 				.classed('noteOffKey', noteOffKey)
 				.on('click', function(d, i) {
 					playedNotes[i] = !playedNotes[i];
@@ -106,7 +141,39 @@ function chordCircle() {
 					updateChord();
 					drawGaps();
 					playChord();
-				});
+				});;
+
+		function radiusInterpolator(d, i) {
+			var startRad = context.chordRad;
+			var endRad = noteRadius(i);
+			return d3.interpolateNumber(startRad, endRad);
+		}
+		function angleInterpolator(d, i) {
+			var startAngle = -HALF_PI;
+			var endAngle = noteAngle(i);
+			return d3.interpolateNumber(startAngle, endAngle);
+		}
+		function tweenSpiralX(d, i) {
+			var ri = radiusInterpolator(d, i);
+			var ai = angleInterpolator(d, i);
+			return function(t) {
+				return ri(t) * Math.cos(ai(t));
+			}
+		}
+		function tweenSpiralY(d, i) {
+		var ri = radiusInterpolator(d, i);
+			var ai = angleInterpolator(d, i);
+			return function(t) {
+				return ri(t) * Math.sin(ai(t));
+			}	
+		}
+		var noteDuration = 100;
+		noteSel.transition()
+			.duration(function(d, i) { return i * noteDuration; })
+			.ease('linear')
+			.attrTween('cx', tweenSpiralX)
+			.attrTween('cy', tweenSpiralY)
+			.each('end', function(d) { player.playNote(d); });
 	}
 
 	function noteRadius(index) {
