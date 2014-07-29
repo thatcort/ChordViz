@@ -62,6 +62,24 @@ function chordCircle() {
 			.on('click', playChord);
 	}
 
+	var keyDrag = d3.behavior.drag()
+					.on('drag', function(d) {
+						var startAngle = noteAngle(d);
+						var angle = Math.atan2(d3.event.y, d3.event.x);
+						keyIndex = Math.round((angle - startAngle)/NOTE_ANGLE);
+						if (keyIndex < 0)
+							keyIndex += 12;
+						setKey(keyIndex);
+					});
+
+	function setKey(index) {
+		radialG.selectAll('line')
+				.classed('keyNote', function(d, i) { return i === keyIndex; });
+		notesG.selectAll('circle')
+				.classed('noteInKey', noteInKey)
+				.classed('noteOffKey', noteOffKey);
+	}
+
 	function drawSpiral() {
 		var cpFactor = .25;
 		var x0 = noteX(0);
@@ -84,14 +102,16 @@ function chordCircle() {
 	}
 
 	function drawRadials() {
-		for (var i=0; i < 12; i++) {
-			radialG.append('line')
-				.classed('radial', true)
-				.attr('x1', gapX(i))
-				.attr('y1', gapY(i))
-				.attr('x2', noteX(i))
-				.attr('y2', noteY(i));
-		}
+		var radials = radialG.selectAll('line').data(d3.range(12));
+		radials.enter().append('line')
+			.classed('radial', true)
+			.attr('x1', function(i) { return gapX(i); })
+			.attr('y1', function(i) { return gapY(i); })
+			.call(keyDrag);
+
+		radials.classed('keyNote', function(d, i) { return i === keyIndex; })
+			.attr('x2', function(i) { return noteX(i); })
+			.attr('y2', function(i) { return noteY(i); });
 	}
 
 	function drawLabels() {

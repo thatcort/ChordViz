@@ -10,11 +10,16 @@ body {
 	stroke: #444;
 	fill: none;
 }
+
 .radial {
 	stroke: #222;
 	stroke-width: 13;
 	fill: none;
 }
+.radial.keyNote {
+	stroke: #555;
+}
+
 .gapCircle {
 	stroke: none;
 	fill: rgba(255,255,255,0);
