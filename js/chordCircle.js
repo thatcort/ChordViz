@@ -217,7 +217,7 @@ function chordCircle() {
 	}
 
 	function noteInKey(note) {
-		return currentKey[(note.index + keyIndex) % 12];
+		return currentKey[(note.index - keyIndex) % 12];
 	}
 	function noteOffKey(note) { return !noteInKey(note); }
 
@@ -286,12 +286,16 @@ function chordCircle() {
 				;
 				// .attr("stroke-opacity", .7);
 		
-		var lowSel = gapLowestG.selectAll('circle').data([lowestNote]);
-		lowSel.enter().append('circle')
-			.classed('lowestNote', true)
-			.attr('r', 5);
-		lowSel.attr('cx', gapX)
-			.attr('cy', gapY);
+		if (gapData.length > 0) {
+			var lowSel = gapLowestG.selectAll('circle').data([lowestNote]);
+			lowSel.enter().append('circle')
+				.classed('lowestNote', true)
+				.attr('r', 5);
+			lowSel.attr('cx', gapX)
+				.attr('cy', gapY);
+		} else {
+			gapLowestG.selectAll('circle').remove();
+		}
 	}
 
 
