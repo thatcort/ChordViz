@@ -247,7 +247,7 @@ function chordCircle() {
 		var lowestNote = null;
 		for (var i=0; i < playedNotes.length; i++) {
 			playedOctave[i%12] |= playedOctave[i%12] || playedNotes[i];
-			if (!lowestNote && playedNotes[i]) {
+			if (lowestNote == null && playedNotes[i]) {
 				lowestNote = i;
 			}
 		}
