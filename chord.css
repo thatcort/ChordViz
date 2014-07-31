@@ -26,7 +26,7 @@ body {
 }
 
 .noteName {
-	fill: white;
+	fill: rgb(166, 158, 118);;
 }
 
 .noteInKey {
@@ -58,7 +58,7 @@ body {
 
 .gaps {
 	stroke-opacity: .7;
-	stroke-width: 10;
+	stroke-width: 13;
 	stroke-linecap: round;
 }
 .gap1 {

@@ -14,6 +14,8 @@ function chordCircle() {
 	var rootG,
 		notesG,
 		gapG,
+		gapLinesG,
+		gapLowestG,
 		radialG,
 		spiralG,
 		labelG;
@@ -49,6 +51,9 @@ function chordCircle() {
 		spiralG = rootG.append('g');
 		notesG = rootG.append('g');
 		gapG = rootG.append('g').classed("gaps", true);
+		gapLinesG = gapG.append('g');
+		gapLowestG = gapG.append('g');
+
 		labelG = rootG.append('g');
 
 		drawRadials();
@@ -69,10 +74,12 @@ function chordCircle() {
 						keyIndex = Math.round((angle - startAngle)/NOTE_ANGLE);
 						if (keyIndex < 0)
 							keyIndex += 12;
-						setKey(keyIndex);
+						else if (keyIndex > 11)
+							keyIndex -= 12;
+						setKeyIndex(keyIndex);
 					});
 
-	function setKey(index) {
+	function setKeyIndex(index) {
 		radialG.selectAll('line')
 				.classed('keyNote', function(d, i) { return i === keyIndex; });
 		notesG.selectAll('circle')
@@ -237,8 +244,12 @@ function chordCircle() {
 
 	function drawGaps(chord) {
 		var playedOctave = [];
+		var lowestNote = null;
 		for (var i=0; i < playedNotes.length; i++) {
 			playedOctave[i%12] |= playedOctave[i%12] || playedNotes[i];
+			if (!lowestNote && playedNotes[i]) {
+				lowestNote = i;
+			}
 		}
 
 		var gapData = [];
@@ -256,7 +267,7 @@ function chordCircle() {
 			}
 		}
 
-		var gapLines = gapG.selectAll("line").data(gapData);
+		var gapLines = gapLinesG.selectAll("line").data(gapData);
 
 		gapLines.enter().append("line");
 
@@ -274,6 +285,13 @@ function chordCircle() {
 				.attr("y2", function(d) { return gapY(d[1]); })
 				;
 				// .attr("stroke-opacity", .7);
+		
+		var lowSel = gapLowestG.selectAll('circle').data([lowestNote]);
+		lowSel.enter().append('circle')
+			.classed('lowestNote', true)
+			.attr('r', 5);
+		lowSel.attr('cx', gapX)
+			.attr('cy', gapY);
 	}
 
 
