@@ -76,10 +76,11 @@ function chordCircle() {
 							keyIndex += 12;
 						else if (keyIndex > 11)
 							keyIndex -= 12;
-						setKeyIndex(keyIndex);
+						context.setKeyIndex(keyIndex);
 					});
 
-	function setKeyIndex(index) {
+	context.setKeyIndex = function(index) {
+		keyIndex = index;
 		radialG.selectAll('line')
 				.classed('keyNote', function(d, i) { return i === keyIndex; });
 		notesG.selectAll('circle')
@@ -217,7 +218,10 @@ function chordCircle() {
 	}
 
 	function noteInKey(note) {
-		return currentKey[(note.index - keyIndex) % 12];
+		var ki = (note.index - keyIndex) % 12;
+		if (ki < 0)
+			ki += 12;
+		return currentKey[ki];
 	}
 	function noteOffKey(note) { return !noteInKey(note); }
 
