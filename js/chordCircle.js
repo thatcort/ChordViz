@@ -26,11 +26,6 @@ function chordCircle() {
 	var NOTE_ANGLE = Math.PI / 6.0;
 	var HALF_PI = Math.PI * .5;
 
-	var majorKey = [ true, false, true, false, true, true, false, true, false, true, false, true ];
-
-	var currentKey = majorKey;
-	var keyIndex = 0;
-
 	var gapRadius,
 		labelRadius;
 
@@ -61,6 +56,8 @@ function chordCircle() {
 		drawNotes();
 		drawLabels();
 
+		data.addListener('keyIndex', 'chordCircle', setKeyIndex);
+
 		rootG.append('circle')
 			.classed('gapCircle', true)
 			.attr('r', gapRadius)
@@ -71,21 +68,31 @@ function chordCircle() {
 					.on('drag', function(d) {
 						var startAngle = noteAngle(d);
 						var angle = Math.atan2(d3.event.y, d3.event.x);
-						keyIndex = Math.round((angle - startAngle)/NOTE_ANGLE);
+						var keyIndex = Math.round((angle - startAngle)/NOTE_ANGLE);
 						if (keyIndex < 0)
 							keyIndex += 12;
 						else if (keyIndex > 11)
 							keyIndex -= 12;
-						context.setKeyIndex(keyIndex);
+						data.keyIndex(keyIndex);
 					});
 
-	context.setKeyIndex = function(index) {
-		keyIndex = index;
+	setKeyIndex = function(keyIndex) {
+		// keyIndex = index;
 		radialG.selectAll('line')
 				.classed('keyNote', function(d, i) { return i === keyIndex; });
-		notesG.selectAll('circle')
-				.classed('noteInKey', noteInKey)
-				.classed('noteOffKey', noteOffKey);
+		update();
+	}
+
+	context.setChord = function(chord) {
+		// unplay all notes
+		playedNotes.forEach(function(item, index) {
+			playedNotes[index] = false;
+		});
+		for (var i=0; i < chord.length; i++) {
+			playedNotes[chord[i]] = true;
+		}
+		update();
+		playChord();
 	}
 
 	function drawSpiral() {
@@ -117,6 +124,7 @@ function chordCircle() {
 			.attr('y1', function(i) { return gapY(i); })
 			.call(keyDrag);
 
+		var keyIndex = data.keyIndex();
 		radials.classed('keyNote', function(d, i) { return i === keyIndex; })
 			.attr('x2', function(i) { return noteX(i); })
 			.attr('y2', function(i) { return noteY(i); });
@@ -161,8 +169,8 @@ function chordCircle() {
 				.attr('r', context.noteRad)
 				.attr('cx', 0)
 				.attr('cy', -context.chordRad)
-				.classed('noteInKey', noteInKey)
-				.classed('noteOffKey', noteOffKey)
+				.classed('noteInKey', data.noteInKey)
+				.classed('noteOffKey', data.noteOffKey)
 				.on('click', function(d, i) {
 					playedNotes[i] = !playedNotes[i];
 					d3.select(this).classed("notePlayed", playedNotes[i]);
@@ -217,13 +225,7 @@ function chordCircle() {
 		return NOTE_ANGLE * index - HALF_PI;
 	}
 
-	function noteInKey(note) {
-		var ki = (note.index - keyIndex) % 12;
-		if (ki < 0)
-			ki += 12;
-		return currentKey[ki];
-	}
-	function noteOffKey(note) { return !noteInKey(note); }
+	function notePlayed(note) { return !!playedNotes[note.index]; }
 
 	function updateChord() {
 		chord = [];
@@ -237,7 +239,14 @@ function chordCircle() {
 		player.playChord(chord);
 	}
 
-
+	function update() {
+		notesG.selectAll('circle')
+			.classed('noteInKey', data.noteInKey)
+			.classed('noteOffKey', data.noteOffKey)
+			.classed('notePlayed', notePlayed);
+		updateChord();
+		drawGaps();
+	}
 
 	function gapX(index) { // note is relative to tonic
 	  return gapRadius * Math.cos(NOTE_ANGLE * index - HALF_PI);
