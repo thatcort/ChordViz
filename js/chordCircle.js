@@ -59,7 +59,7 @@ function chordCircle() {
 		data.addListener('keyIndex', 'chordCircle', setKeyIndex);
 
 		rootG.append('circle')
-			.classed('gapCircle', true)
+			.classed('transparent', true)
 			.attr('r', gapRadius)
 			.on('click', playChord);
 	}
@@ -69,10 +69,26 @@ function chordCircle() {
 						var startAngle = noteAngle(d);
 						var angle = Math.atan2(d3.event.y, d3.event.x);
 						var keyIndex = Math.round((angle - startAngle)/NOTE_ANGLE);
-						if (keyIndex < 0)
-							keyIndex += 12;
-						else if (keyIndex > 11)
-							keyIndex -= 12;
+						data.keyIndex(keyIndex);
+					});
+	var dragStart;
+	var circleDrag = d3.behavior.drag()
+					.on('dragstart', function() {
+						dragStart = { keyIndex: data.keyIndex() };
+					})
+					.on('dragend', function() {
+						dragStart = null;
+					})
+					.on('drag', function(d) {
+						if (!dragStart.x) {
+							dragStart.x = d3.event.x;
+							dragStart.y = d3.event.y;
+							dragStart.angle = Math.atan2(dragStart.y, dragStart.x);
+						}
+						var angle = Math.atan2(d3.event.y, d3.event.x);
+						var da = angle - dragStart.angle;
+						var keySteps = Math.round(da/NOTE_ANGLE);
+						var keyIndex = dragStart.keyIndex + keySteps;
 						data.keyIndex(keyIndex);
 					});
 
@@ -88,8 +104,13 @@ function chordCircle() {
 		playedNotes.forEach(function(item, index) {
 			playedNotes[index] = false;
 		});
+		// play the specified chord
 		for (var i=0; i < chord.length; i++) {
-			playedNotes[chord[i]] = true;
+			var index = chord[i];
+			if (typeof index !== 'number') {
+				index = index.index; // assume a note object
+			}
+			playedNotes[index] = true;
 		}
 		update();
 		playChord();
@@ -117,6 +138,11 @@ function chordCircle() {
 	}
 
 	function drawRadials() {
+		radialG.append('circle')
+			.data([ {x: 0, y: 0}])
+			.classed('transparent', true)
+			.attr('r', context.chordRad)
+			.call(circleDrag);
 		var radials = radialG.selectAll('line').data(d3.range(12));
 		radials.enter().append('line')
 			.classed('radial', true)

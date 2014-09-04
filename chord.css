@@ -1,9 +1,16 @@
+.vcenter {
+    display: inline-block;
+    vertical-align: middle;
+    float: none;
+}
+
 body {
 	font-family: calibri, sans-serif;
 }
 
 .background {
 	background-color: rgb(27, 25, 15);
+	color: rgb(166, 158, 118);
 }
 
 .noteSpiral {
@@ -20,13 +27,13 @@ body {
 	stroke: #555;
 }
 
-.gapCircle {
+.transparent {
 	stroke: none;
 	fill: rgba(255,255,255,0);
 }
 
 .noteName {
-	fill: rgb(166, 158, 118);;
+	fill: rgb(166, 158, 118);
 }
 
 .noteInKey {
@@ -78,4 +85,12 @@ body {
 }
 .gap6 {
 	stroke: rgb(228, 108, 10);
+}
+
+.tonicBtn {
+	width: 2em;
+	text-align: center;
+	border: 1px solid rgb(132, 127, 100);
+	color: rgb(166, 158, 118);
+	font-size: 150%;
 }

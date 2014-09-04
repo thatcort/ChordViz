@@ -43,8 +43,29 @@ function chordData() {
 			return keyIndex;
 		}
 		keyIndex = _;
+		while (keyIndex < 0) {
+			keyIndex += 12;
+		}
+		while (keyIndex > 11) {
+			keyIndex -= 12;
+		}
 		dispatch.keyIndex(keyIndex);
 	};
+
+	/** Return the note corresponding to the index in the key.
+	 *  E.g. if the key is D major, then keyNote(0) = D and keyNote(1) = E.
+	 */
+	data.keyNote = function(index) {
+		var count = -1;
+		var i = 0;
+		while (count < index) {
+			if (currentKey[i % currentKey.length]) {
+				count++;
+			}
+			i++;
+		}
+		return notes[keyIndex + i - 1];
+	}
 
 	data.noteInKey = function(note) {
 		var ki = (note.index - keyIndex) % 12;

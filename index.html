@@ -2,30 +2,78 @@
 <html>
 <head>
 	<title>Chords</title>
-	<script type="text/javascript" src="lib/d3.v2.js"></script>
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+	<meta name="viewport" content="width=device-width, user-scalable=no">
 
+	<script type="text/javascript" src="lib/d3.js"></script>
+	<script type="text/javascript" src="lib/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="js/chordData.js"></script>
+	<script type="text/javascript" src="js/chordControls.js"></script>
 	<script type="text/javascript" src="js/chordCircle.js"></script>
 	<script type="text/javascript" src="js/player.js"></script>
 
+	<link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<script src="lib/bootsrap/js/bootstrap.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="chord.css"/>
 </head>
 <body class="background">
-	<audio src="audio/piano/2C#.mp3" autoplay></audio>
-	<!-- <audio src="audio/piano/3A.mp3" autoplay></audio> -->
-
-	<div id="chordContainer"></div>
+	<div class="container">
+		<div class="row"><div class="col-xs-12"><h1>Chord Visualizer</h1></div></div>
+		<div class="row">
+			<div id="controls" class="col-xs-1 vcenter">
+<!-- 				<div id="rootBlock" class="filterItem">
+					Key Root<br />
+					<select name="rootSelect">
+						<option value="0">C</option>
+						<option value="1">C#/Db</option>
+						<option value="2">D</option>
+						<option value="3">D#/Eb</option>
+						<option value="4">E</option>
+						<option value="5">F</option>
+						<option value="6">F#</option>
+						<option value="7">G</option>
+						<option value="8">G#/Ab</option>
+						<option value="9">A</option>
+						<option value="10">A#/Bb</option>
+						<option value="11">B</option>
+					</select>
+				</div> -->
+		<!-- 		<div id="scaleBlock" class="filterItem">
+					Mode<br />
+					<select name="scaleSelect">
+						<option value="0">Major</option>
+						<option value="5">Minor</option>
+						<option value="2">Dorian</option>
+						<option value="3">Phrygian</option>
+						<option value="4">Lydian</option>
+						<option value="6">Mixolydian</option>
+						<option value="7">Locrian</option>
+					</select>
+				</div> -->
+				<div id="chordBlock">
+					<div class="tonicBtn" data-tonic="7">vii</div>
+					<div class="tonicBtn" data-tonic="6">vi</div>
+					<div class="tonicBtn" data-tonic="5">V</div>
+					<div class="tonicBtn" data-tonic="4">IV</div>
+					<div class="tonicBtn" data-tonic="3">iii</div>
+					<div class="tonicBtn" data-tonic="2">ii</div>
+					<div class="tonicBtn" data-tonic="1">I</div>
+				</div>
+			</div><!-- 
+			 --><div id="chordContainer" class="col-xs-11 vcenter"></div>
+		</div>
+	</div>
 	<div id="audios"></div>
 	<script type="text/javascript">
 
 		var chordRad = 200; // radius of main chord circle
-		var marginX = 140;
+		var marginX = 20;
 		var marginY = 40;
 
 		var svg = d3.select("#chordContainer")
 					.append("svg")
-					.attr("width", "1000")
-					.attr("height", "1000");
+					.attr("width", (chordRad + marginX)*2)
+					.attr("height", (chordRad + marginY)*2);
 
 		var rootG = svg.append('g')
 					.attr('transform', 'translate(' + marginX + ', ' + marginY + ')');
@@ -36,9 +84,12 @@
 		var chordCircle = chordCircle();
 		var player = chordPlayer();
 
+		var controls = chordControls();
+
 		function playerCallback() {
 			chordCircle.chordRad = chordRad;
 			chordCircle.init(rootG, chordData, player);
+			controls.init(chordData, chordCircle);
 		}
 		player.init(playerCallback);
 
