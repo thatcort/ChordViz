@@ -93,4 +93,5 @@ body {
 	border: 1px solid rgb(132, 127, 100);
 	color: rgb(166, 158, 118);
 	font-size: 150%;
+	cursor: pointer;
 }
