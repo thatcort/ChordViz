@@ -8,6 +8,20 @@ body {
 	font-family: calibri, sans-serif;
 }
 
+a:link {
+    color: rgb(166, 158, 118);
+}
+
+/* visited link */
+a:visited {
+    color: rgb(166, 158, 118);
+}
+
+/* visited link */
+a:hover {
+    color: rgb(166, 158, 118);
+}
+
 .background {
 	background-color: rgb(27, 25, 15);
 	color: rgb(166, 158, 118);
@@ -94,4 +108,18 @@ body {
 	color: rgb(166, 158, 118);
 	font-size: 150%;
 	cursor: pointer;
+}
+
+#xsControls {
+	margin-left: 50px;
+}
+
+@media (max-width: 768px) {
+	.tonicBtn {
+		display: inline-block;
+		margin: 0px;
+	}
+	#chordBlock {
+		display: none;
+	}
 }

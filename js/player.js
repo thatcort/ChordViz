@@ -23,6 +23,7 @@ function chordPlayer() {
 				waitingToLoad[index] = false;
 				numberLoading--;
 			}
+// console.log('audioReady: ' + index + '; still waiting for ' + numberLoading);
 			if (numberLoading <= 0) {
 				loadedCallback();
 			}

@@ -12,7 +12,7 @@ function chordControls() {
 
 		// $('select[name=rootSelect]').change(rootChange);
 
-		$('#chordBlock .tonicBtn').on('click', function(event) {
+		$('.tonicBtn').on('click', function(event) {
 			var tonic = $(this).data('tonic');
 			var chord = [];
 			chord.push(data.keyNote(tonic - 1));
