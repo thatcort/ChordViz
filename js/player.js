@@ -29,6 +29,7 @@ function chordPlayer() {
 			}
 		}
 		audioSel.enter().append("audio")
+			.attr("preload", "auto")
 			.on('canplaythrough', function(d, i) { audioReady(i); d3.select(this).on('canplaythrough', null); })
 			.each(function(d) { audios.push(this); })
 			.attr("src", function(d) { return d; });
