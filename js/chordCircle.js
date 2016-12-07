@@ -35,6 +35,9 @@ function chordCircle() {
 		player = chordPlayer;
 		notes = data.getNotes();
 
+		let sizeFactor = context.chordRad / 200;
+		context.noteRad *= sizeFactor;
+		context.octaveGap *= sizeFactor;
 		gapRadius = noteRadius(notes.length-1) - context.noteRad*2;
 		labelRadius = context.chordRad + context.noteRad*2;
 

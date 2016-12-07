@@ -21,16 +21,18 @@
 		<div class="row"><div class="col-xs-12">&nbsp;</div></div>
 		<div class="row"><div class="col-xs-12"><a href="http://briancort.com">&lt; &lt; briancort.com</a></div></div>
 		<div class="row"><div class="col-xs-12"><h1>Chord Visualizer</h1></div></div>
-		<div class="row"><div class="col-xs-12"><p><strong>Requires audio</strong>
-		<p>A visual representation of the intervals between notes in a musical chord.
-			<ul>
-				<li>Click the note cirlces to add/remove them from the chord
-				<li>Change the key by dragging the brighter spoke around the circle 
-				<li>Click the middle to play the chord again
-				<li>Use the buttons to play a triad
-				<li>Works best in desktop browsers
-			</ul>
-			<br>
+		<div class="row">
+			<div class="col-xs-12"><p><strong>Requires audio</strong>
+				<p>A visual representation of the intervals between notes in a musical chord.
+				<ul>
+					<li>Click the note cirlces to add/remove them from the chord
+					<li>Change the key by dragging the brighter spoke around the circle 
+					<li>Click the middle to play the chord again
+					<li>Use the buttons to play a triad
+					<li>Works best in desktop browsers
+				</ul>
+				<br>
+			</div>
 		</div>
 		<div class="row">
 			<div id="controls" class="col-sm-1 vcenter hidden-xs-inline-block">
@@ -90,9 +92,11 @@
 	<div id="audios"></div>
 	<script type="text/javascript">
 
-		var chordRad = 200; // radius of main chord circle
-		var marginX = 50;
-		var marginY = 40;
+		let vizWidth = $('#chordContainer').width();
+		let sizeFactor = vizWidth < 300 ? vizWidth / 300 : 1.0;
+		var marginX = 50 * sizeFactor;
+		var marginY = 40 * sizeFactor;
+		var chordRad = Math.min(200, vizWidth*0.5 - marginX*2); // 200; // radius of main chord circle
 
 		var svg = d3.select("#chordContainer")
 					.append("svg")
