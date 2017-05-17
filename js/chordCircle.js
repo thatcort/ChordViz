@@ -30,7 +30,7 @@ function chordCircle() {
 		labelRadius;
 
 
-	context.init = function(parent, chordData, chordPlayer) {
+	context.init = function(parent, chordData, chordPlayer, callback) {
 		data = chordData;
 		player = chordPlayer;
 		notes = data.getNotes();
@@ -56,7 +56,7 @@ function chordCircle() {
 
 		drawRadials();
 		drawSpiral();
-		drawNotes();
+		drawNotes(callback);
 		drawLabels();
 
 		data.addListener('keyIndex', 'chordCircle', setKeyIndex);
@@ -190,7 +190,7 @@ function chordCircle() {
 			.text(function(d) { return d.name; });
 	}
 
-	function drawNotes() {
+	function drawNotes(callback) {
 		var noteSel = notesG.selectAll('circle').data(notes);
 
 		noteSel.enter() // .append('g')
@@ -238,7 +238,12 @@ function chordCircle() {
 			.ease('linear')
 			.attrTween('cx', tweenSpiralX)
 			.attrTween('cy', tweenSpiralY)
-			.each('end', function(d) { player.playNote(d); });
+			.each('end', function(d, i) {
+				player.playNote(d);
+				if (i === noteSel.size()-1) {
+					setTimeout(callback, noteDuration*6);
+				}
+			});
 	}
 
 	function noteRadius(index) {

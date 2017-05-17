@@ -14,12 +14,10 @@ function chordControls() {
 
 		$('.tonicBtn').on('click', function(event) {
 			var tonic = $(this).data('tonic');
-			var chord = [];
-			chord.push(data.keyNote(tonic - 1));
-			chord.push(data.keyNote(tonic + 1));
-			chord.push(data.keyNote(tonic + 3));
-			chordCircle.setChord(chord);
+			tonicClicked(tonic);
 		});
+
+		tonicClicked(1);
 	}
 
 	function rootChange(event) {
@@ -28,7 +26,11 @@ function chordControls() {
 	}
 
 	function tonicClicked(tonic) {
-
+		var chord = [];
+		chord.push(data.keyNote(tonic - 1));
+		chord.push(data.keyNote(tonic + 1));
+		chord.push(data.keyNote(tonic + 3));
+		chordCircle.setChord(chord);
 	}
 
 	return controls;

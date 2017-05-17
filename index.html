@@ -116,8 +116,9 @@
 
 		function playerCallback() {
 			chordCircle.chordRad = chordRad;
-			chordCircle.init(rootG, chordData, player);
-			controls.init(chordData, chordCircle);
+			chordCircle.init(rootG, chordData, player, function() {
+				controls.init(chordData, chordCircle);
+			});
 		}
 		player.init(playerCallback);
 
